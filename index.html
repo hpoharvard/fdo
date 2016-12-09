@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>FDO Prototype - 0.1</title>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.1/esri/css/main.css">
+  <script src="https://js.arcgis.com/4.1/"></script>
+
+  <style>
+    html,
+    body,
+    #viewDiv {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    #infoDiv {
+      background-color: white;
+      color: black;
+      padding: 6px;
+      width: 260px;
+    }
+    
+    #results {
+      padding: 6px;
+      font-weight: normal;
+          font: 13.3333px Arial;
+    }
+  </style>
+
+  <script>
+    require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/FeatureLayer",
+        "esri/layers/GraphicsLayer",
+        "esri/geometry/geometryEngine",
+        "esri/Graphic",
+        "esri/symbols/SimpleFillSymbol",
+        "esri/symbols/SimpleMarkerSymbol",
+        "esri/renderers/SimpleRenderer",
+        "esri/layers/MapImageLayer",
+        "esri/layers/TileLayer",
+        "dojo/on",
+        "dojo/dom",
+        "dojo/dom-construct",
+        "dojo/domReady!"
+      ],
+      function(
+        Map, MapView,
+        FeatureLayer,
+        GraphicsLayer,
+        geometryEngine,
+        Graphic,
+        SimpleFillSymbol,
+        SimpleMarkerSymbol,
+        SimpleRenderer,
+        MapImageLayer,
+        TileLayer,
+        on, dom, domConstruct
+      ) {
+        
+        var fdoUrl = "https://map.harvard.edu/arcgis/rest/services/FDO/fdo/MapServer/1";
+        var layerBuildingTextUrl = "https://map.harvard.edu/arcgis/rest/services/MapText/MapServer";
+        var layerbaseUrl = "https://map.harvard.edu/arcgis/rest/services/AerialBase/MapServer"
+        var layerbase = new TileLayer({url: layerbaseUrl});
+
+        var layerBuildingText = new MapImageLayer(layerBuildingTextUrl);
+
+        var buildingRenderer = new SimpleRenderer({
+          symbol: new SimpleFillSymbol({
+            color: [0,137, 252, 0.4 ],
+            style: "solid",
+            outline: {
+              width: 1,
+              color: "blue"
+            }
+          })
+        });
+        
+        var fdoLayer = new FeatureLayer({
+          url: fdoUrl,
+          outFields: ["*"],
+          visible: true,
+          renderer: buildingRenderer
+        });        
+        // GraphicsLayer for displaying results
+        var resultsLayer = new GraphicsLayer();
+
+        var map = new Map({
+          basemap: "topo",
+          layers: [fdoLayer, resultsLayer]
+          //layers: [fdoLayer, resultsLayer, layerBuildingText]
+        });
+
+        var view = new MapView({
+          container: "viewDiv",
+          map: map,
+          center: [-71.116076, 42.37375], /*-71.11607611178287, 42.37410778220068*/
+          zoom: 18
+        });
+        view.ui.add("infoDiv", "top-right");
+
+        var amenities = document.getElementById("infoamenities");
+
+        amenities.addEventListener("change", function() {
+          var selectedAmenities = amenities.options[amenities.selectedIndex].value;
+          //console.log(selectedAmenities);
+          queryFdo(selectedAmenities).then(displayResults);
+        });
+        
+        function queryFdo(myval) {
+          var query = fdoLayer.createQuery();
+          if(myval == 'Special'){
+            query.where = myval + " <> 'null'"
+            return fdoLayer.queryFeatures(query);
+          }
+          else{
+            query.where = myval + " = 'Yes'"
+            return fdoLayer.queryFeatures(query);
+          } 
+        }
+
+        // display the earthquake query results in the
+        // view and print the number of results to the DOM
+        function displayResults(results) {
+          document.getElementById("results").innerHTML = '';
+          document.getElementById("results").innerHTML = 'List of buildings ';
+          resultsLayer.removeAll();
+          //dom.byId("results").innerHTML = '';
+          var features = results.features.map(function(graphic) {
+            graphic.symbol = new SimpleFillSymbol({
+              color: [ 255,0, 0, 0.6],
+              style: "solid",
+              outline: {  // autocasts as esri/symbols/SimpleLineSymbol
+                color: "red",
+                width: 2
+              }
+            });
+            return graphic;
+          });
+          //var numQuakes = features.length;
+          //dom.byId("results").innerHTML = results + " earthquakes found";
+          //console.log(results.features)
+          //dom.byId("results").innerHTML = "List of "
+       
+          var bArray = [];
+          for (i = 0; i < results.features.length; i++) { 
+            bArray.push(results.features[i].attributes.Primary_Building_Name) 
+          };
+
+          document.getElementById('results').appendChild(makeUL(bArray.sort()));
+          resultsLayer.addMany(features);
+        }        
+
+        /*query building and return amenities*/
+        var amenitiesSingleBuilding = document.getElementById("infobuldings");
+
+        amenitiesSingleBuilding.addEventListener("change", function() {
+          var selectedAmenities = amenitiesSingleBuilding.options[amenitiesSingleBuilding.selectedIndex].value;
+          //console.log(selectedAmenities);
+          querySingleFdo(selectedAmenities).then(displayResultsSingle);
+          //querySingleFdo().then(displayResults1);
+        });
+
+        function querySingleFdo(bval) {
+          var query = fdoLayer.createQuery();
+          query.where =  "Primary_Building_Name = '" + bval.trim() + "'"
+          return fdoLayer.queryFeatures(query);           
+        }
+
+        function displayResultsSingle(results) {
+          console.log(results.features[0].attributes)
+          resultsLayer.removeAll();
+          //dom.byId("results").innerHTML = '';
+          var features = results.features.map(function(graphic) {
+            
+            graphic.symbol = new SimpleFillSymbol({
+              color: [ 255,0, 0, 0.7],
+              style: "solid",
+              outline: {  // autocasts as esri/symbols/SimpleLineSymbol
+                color: "red",
+                width: 2
+              }
+            });
+            return graphic;
+          });
+          
+          var bArray = [];        
+          var bArrayNew = [];
+          for (var [key, value] of Object.entries(results.features[0].attributes)) {            
+            if((key == 'Laundry' || key == 'Music' || key == 'Kitchen' || key == 'Common' || key == 'Study' || key == 'Computer' ||  key == 'Printer' || key == 'Elevators' || key == 'VendingMachines' || key == 'RecyclingCompost' || key == 'GameTables' || key == 'Special') && value != 'No' && value != null ){
+              bArray.push(key.split(/(?=[A-Z])/).join(" ") + ": " + value)
+            }
+          }
+          //console.log(bArray)
+          for (var a in bArray){
+            bArrayNew.push(bArray[a].replace(": Yes",""))
+          }
+          console.log(bArrayNew.length)
+          if (bArrayNew.length  == 0) {
+            document.getElementById("results").innerHTML = '';
+            document.getElementById("results").innerHTML = 'There are not amenities in this building!';                      
+          }
+          else{  
+            document.getElementById("results").innerHTML = '';
+            document.getElementById("results").innerHTML = 'List of amenities ';          
+            document.getElementById('results').appendChild(makeUL(bArrayNew));
+          }    
+          resultsLayer.addMany(features);
+        }
+
+        function makeUL(array) {            
+            
+            var list = document.createElement('ul');
+
+            for(var i = 0; i < array.length; i++) {               
+                var item = document.createElement('li');                
+                item.appendChild(document.createTextNode(array[i]));               
+                list.appendChild(item);
+            }            
+            return list;
+        }  
+
+      });
+
+
+  </script>
+
+</head>
+
+<body>
+  <div id="viewDiv"></div>
+  <div id="infoDiv">      
+    <select id="infoamenities">
+      <option value="Laundry">Laundry Room</option>
+      <option value="Music">Music Room</option>
+      <option value="Kitchen">Kitchen Room</option>
+      <option value="Common">Common Space</option>
+      <option value="Study">Study Room</option>
+      <option value="Computer">Computer Room</option>
+      <option value="Printer">Printer</option>
+      <option value="Elevators">Elevators</option>
+      <option value="VendingMachines">Vending Machines</option>
+      <option value="RecyclingCompost">Recycling and Compost</option>
+      <option value="GameTables">Game Table Room</option>
+      <option value="Special">Special</option>
+    </select>
+    <select id="infobuldings">
+      <option value=" Canaday Hall"> Canaday Hall</option>
+      <option value=" Grays Hall"> Grays Hall</option>
+      <option value=" Greenough Hall"> Greenough Hall</option>
+      <option value=" Hollis Hall"> Hollis Hall</option>
+      <option value=" Holworthy Hall"> Holworthy Hall</option>
+      <option value=" Hurlbut Hall"> Hurlbut Hall</option>
+      <option value=" Lionel Hall"> Lionel Hall</option>
+      <option value=" Massachusetts Hall"> Massachusetts Hall</option>
+      <option value=" Matthews Hall"> Matthews Hall</option>
+      <option value=" Mower Hall"> Mower Hall</option>
+      <option value=" Pennypacker Hall"> Pennypacker Hall</option>
+      <option value=" Stoughton Hall"> Stoughton Hall</option>
+      <option value=" Straus Hall"> Straus Hall</option>
+      <option value=" Thayer Hall"> Thayer Hall</option>
+      <option value=" Weld Hall"> Weld Hall</option>
+      <option value=" Wigglesworth Hall A"> Wigglesworth Hall A</option>
+      <option value=" Wigglesworth Hall B"> Wigglesworth Hall B</option>
+      <option value=" Wigglesworth Hall C"> Wigglesworth Hall C</option>
+      <option value=" Apley Court at Dudley House"> Apley Court at Dudley House</option>  
+    </select>
+    <div id='results'></div>
+  </div>
+</body>
+
+</html>
