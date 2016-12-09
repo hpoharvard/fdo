@@ -125,8 +125,6 @@
           } 
         }
 
-        // display the earthquake query results in the
-        // view and print the number of results to the DOM
         function displayResults(results) {
           document.getElementById("results").innerHTML = '';
           document.getElementById("results").innerHTML = 'List of buildings ';
@@ -143,11 +141,7 @@
             });
             return graphic;
           });
-          //var numQuakes = features.length;
-          //dom.byId("results").innerHTML = results + " earthquakes found";
-          //console.log(results.features)
-          //dom.byId("results").innerHTML = "List of "
-       
+          
           var bArray = [];
           for (i = 0; i < results.features.length; i++) { 
             bArray.push(results.features[i].attributes.Primary_Building_Name) 
@@ -189,41 +183,46 @@
             });
             return graphic;
           });
+
+          resultsLayer.addMany(features);
           
           var bArray = [];        
           var bArrayNew = [];
-          for (var [key, value] of Object.entries(results.features[0].attributes)) {            
-            if((key == 'Laundry' || key == 'Music' || key == 'Kitchen' || key == 'Common' || key == 'Study' || key == 'Computer' ||  key == 'Printer' || key == 'Elevators' || key == 'VendingMachines' || key == 'RecyclingCompost' || key == 'GameTables' || key == 'Special') && value != 'No' && value != null ){
-              bArray.push(key.split(/(?=[A-Z])/).join(" ") + ": " + value)
+          var obj = results.features[0].attributes;
+          // filter the object to create a correct list  
+          for(var key in obj){
+            // skip loop if the property is from prototype
+            if(!obj.hasOwnProperty(key)) continue;            
+            if(typeof obj[key] !== 'object'){
+              if((key == 'Laundry' || key == 'Music' || key == 'Kitchen' || key == 'Common' || key == 'Study' || key == 'Computer' ||  key == 'Printer' || key == 'Elevators' || key == 'VendingMachines' || key == 'RecyclingCompost' || key == 'GameTables' || key == 'Special') && obj[key] != 'No' && obj[key] != null ){
+                  bArray.push(key.split(/(?=[A-Z])/).join(" ") + ": " + obj[key])
+              }              
             }
           }
-          //console.log(bArray)
+
           for (var a in bArray){
             bArrayNew.push(bArray[a].replace(": Yes",""))
           }
-          console.log(bArrayNew.length)
+          //console.log(bArrayNew.length)
           if (bArrayNew.length  == 0) {
             document.getElementById("results").innerHTML = '';
-            document.getElementById("results").innerHTML = 'There are not amenities in this building!';                      
+            document.getElementById("results").innerHTML = 'There are not amenities in this building!';                    
           }
           else{  
             document.getElementById("results").innerHTML = '';
             document.getElementById("results").innerHTML = 'List of amenities ';          
             document.getElementById('results').appendChild(makeUL(bArrayNew));
-          }    
-          resultsLayer.addMany(features);
+          }          
         }
-
-        function makeUL(array) {            
-            
-            var list = document.createElement('ul');
-
-            for(var i = 0; i < array.length; i++) {               
-                var item = document.createElement('li');                
-                item.appendChild(document.createTextNode(array[i]));               
-                list.appendChild(item);
-            }            
-            return list;
+        // create the list to display values  
+        function makeUL(array) {
+          var list = document.createElement('ul');
+          for(var i = 0; i < array.length; i++) {               
+              var item = document.createElement('li');                
+              item.appendChild(document.createTextNode(array[i]));               
+              list.appendChild(item);
+          }            
+          return list;
         }  
 
       });
