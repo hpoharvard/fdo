@@ -1,0 +1,22 @@
+html,body,
+#viewDiv {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#infoDiv {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: black;
+  padding: 6px;
+  width: 260px;
+  border-radius: 5px;
+}
+
+#results {
+  padding: 6px;
+  font-weight: normal;
+  font: 13.3333px Arial;
+
+}
