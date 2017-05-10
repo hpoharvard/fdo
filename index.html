@@ -2,59 +2,171 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>FDO Prototype - 0.1</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="description" content="Harvard University, Arts First 2017. Web Mapping about Harvard
+  University 2017 Arts Festival">
+  <meta name="keywords" content="HTML, CSS, JavaScript">
+  <meta name="author" content="Giovanni Zambotti">
 
-  <link rel="stylesheet" href="https://js.arcgis.com/4.1/esri/css/main.css">
-  <link rel="stylesheet" href="css/fdo.css">
+  <title>FDO Map</title>
+
+  <!-- Calcite Maps Bootstrap -->
+  <link rel="stylesheet" href="https://esri.github.io/calcite-maps/dist/css/calcite-maps-bootstrap.min-v0.3.css">
+
+  <!-- Calcite Maps -->
+  <link rel="stylesheet" href="https://esri.github.io/calcite-maps/dist/css/calcite-maps-arcgis-4.x.min-v0.3.css">
+
+  <!-- ArcGIS JS 4 -->
+  <link rel="stylesheet" href="https://js.arcgis.com/4.3/esri/css/main.css">
+  <!-- Custome JS 4 -->
+  <link rel="stylesheet" href="css/fdo.css">  
 </head>
 
-<body>
-  <div id="viewDiv"></div>
-  <div id="infoDiv">      
-    <select id="infoamenities">
-      <option selected disabled hidden>Select an amenities...</option>
-      <option value="Laundry">Laundry Room</option>
-      <option value="Music">Music Room</option>
-      <option value="Kitchen">Kitchen Room</option>
-      <option value="Common">Common Space</option>
-      <option value="Study">Study Room</option>
-      <option value="Computer">Computer Room</option>
-      <option value="Printer">Printer</option>
-      <option value="Elevators">Elevators</option>
-      <option value="VendingMachines">Vending Machines</option>
-      <option value="RecyclingCompost">Recycling and Compost</option>
-      <option value="GameTables">Game Table Room</option>
-      <option value="Special">Special</option>
-    </select>
-    <!--
-    <select id="infobuldings">
-      <option value=" Canaday Hall"> Canaday Hall</option>
-      <option value=" Grays Hall"> Grays Hall</option>
-      <option value=" Greenough Hall"> Greenough Hall</option>
-      <option value=" Hollis Hall"> Hollis Hall</option>
-      <option value=" Holworthy Hall"> Holworthy Hall</option>
-      <option value=" Hurlbut Hall"> Hurlbut Hall</option>
-      <option value=" Lionel Hall"> Lionel Hall</option>
-      <option value=" Massachusetts Hall"> Massachusetts Hall</option>
-      <option value=" Matthews Hall"> Matthews Hall</option>
-      <option value=" Mower Hall"> Mower Hall</option>
-      <option value=" Pennypacker Hall"> Pennypacker Hall</option>
-      <option value=" Stoughton Hall"> Stoughton Hall</option>
-      <option value=" Straus Hall"> Straus Hall</option>
-      <option value=" Thayer Hall"> Thayer Hall</option>
-      <option value=" Weld Hall"> Weld Hall</option>
-      <option value=" Wigglesworth Hall A"> Wigglesworth Hall A</option>
-      <option value=" Wigglesworth Hall B"> Wigglesworth Hall B</option>
-      <option value=" Wigglesworth Hall C"> Wigglesworth Hall C</option>
-      <option value=" Apley Court at Dudley House"> Apley Court at Dudley House</option>  
-    </select>
-    -->
-    <div id='results'></div>
+<body class="calcite-maps calcite-nav-top">
+
+  <!-- Navbar -->
+
+  <nav class="navbar calcite-navbar navbar-fixed-top calcite-text-dark calcite-bg-dark" style="background-color: rgb(196, 221, 250);">
+    <!-- Menu -->
+    <div class="dropdown calcite-dropdown calcite-text-dark calcite-bg-light" role="presentation">
+      <a class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">
+        <div class="calcite-dropdown-toggle">
+          <span class="sr-only">Toggle dropdown menu</span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </a>
+      <ul class="dropdown-menu">
+        <li><a role="button" data-target="#panelInfo" aria-haspopup="true"><span class="glyphicon glyphicon-info-sign"></span> Info</a></li>        
+        <li><a role="button" data-target="#panelFilter" aria-haspopup="true"><span class="glyphicon glyphicon-filter"></span>Select a dormitory or amenity</a></li>        
+        <li><a role="button" id="calciteToggleNavbar" aria-haspopup="true"><span class="glyphicon glyphicon-fullscreen"></span> Full Map</a></li>
+      </ul>
+    </div>
+    <!-- Title -->
+    <div class="calcite-title calcite-overflow-hidden">
+      <span class="calcite-title-main">Freshman Map</span>
+      <span class="calcite-title-divider hidden-xs"></span>
+      <span class="calcite-title-sub hidden-xs">First-Year Dormitory and Amenity</span>
+    </div>
+    <!-- Nav -->
+    <ul class="nav navbar-nav calcite-nav">
+      <li>
+        <div class="calcite-navbar-search calcite-search-expander">
+          <div id="searchWidgetDiv"></div>
+        </div>
+      </li>
+    </ul>
+  </nav>
+  <!--/.calcite-navbar -->
+
+  <!-- Map  -->
+
+  <div class="calcite-map calcite-map-absolute">
+    <div id="mapViewDiv"></div>
   </div>
-  <script src="https://js.arcgis.com/4.1/"></script>
-  <script src="js/fdo.js"></script>
+  <!-- /.calcite-map -->
 
+  <!-- Panels -->
+
+  <div class="calcite-panels calcite-panels-right calcite-text-dark calcite-bg-dark panel-group" style="background-color: rgb(196, 221, 250);">
+
+    <!-- Info Panel -->
+    <div id="panelInfo" class="panel collapse">
+      <div id="headingInfo" class="panel-heading" role="tab">
+        <div class="panel-title" style="background-color: rgb(196, 221, 250);">
+          <a class="panel-toggle collapsed" role="button" data-toggle="collapse" href="#collapseInfo"
+            aria-expanded="false" aria-controls="collapseInfo"><span class="glyphicon glyphicon-info-sign
+" aria-hidden="true"></span><span class="panel-label">Info</span></a>
+          <a class="panel-close" role="button" data-toggle="collapse" data-target="#panelInfo"><span class="esri-icon esri-icon-close" aria-hidden="true"></span></a>
+        </div>
+      </div>
+      <div id="collapseInfo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingInfo">
+        <div class="panel-body">
+        <p> 
+        <a class="artsinfo" href="http://ofa.fas.harvard.edu/arts" target="_blank">More info here!</a>
+        </p>          
+        </div>
+      </div>
+    </div>
+    
+    <!-- Filter Panel -->
+    <div id="panelFilter" class="panel collapse in" >
+      <div id="headingFilter" class="panel-heading" role="tab">
+        <div class="panel-title" style="background-color: rgb(196, 221, 250);">
+          <a class="panel-toggle collapsed" role="button" data-toggle="collapse" href="#collapseFilter"
+            aria-expanded="false" aria-controls="collapseFilter"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span><span class="panel-label">Select a dormitory or amenity</span></a>
+          <a class="panel-close" role="button" data-toggle="collapse" data-target="#panelFilter"><span class="esri-icon esri-icon-close" aria-hidden="true"></span></a>
+        </div>
+      </div>
+      <div id="collapseFilter" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingFilter">
+        <div class="panel-body">
+          <select id="infoDorms" class="form-control">
+            <option selected disabled hidden>Select a dorm...</option>
+            <option value= "Apley Court at Dudley House">Apley Court</option>
+            <option value= "Canaday Hall">Canaday</option>
+            <option value= "Grays Hall">Grays</option>
+            <option value= "Greenough Hall">Greenough</option>
+            <option value= "Hollis Hall">Hollis</option>
+            <option value= "Holworthy Hall">Holworthy</option>
+            <option value= "Hurlbut Hall">Hurlbut</option>
+            <option value= "Lionel Hall">Lionel</option>
+            <option value= "Massachusetts Hall">Massachusetts Hall</option>
+            <option value= "Matthews Hall">Matthews</option>
+            <option value= "Mower Hall">Mower</option>
+            <option value= "Pennypacker Hall">Pennypacker</option>
+            <option value= "Stoughton Hall">Stoughton</option>
+            <option value= "Straus Hall">Straus</option>
+            <option value= "Thayer Hall">Thayer</option>
+            <option value= "Weld Hall">Weld Hall</option>
+            <option value= "Wigglesworth Hall A">Wigglesworth Hall A-D</option>
+            <option value= "Wigglesworth Hall B">Wigglesworth Hall E-I</option>
+            <option value= "Wigglesworth Hall C">Wigglesworth Hall J-K</option>
+              
+          </select>
+        </div>
+        <div class="panel-body">
+          <select id="infoAmenities" class="form-control">
+            <option selected disabled hidden>Select an amenities...</option>
+            <option value="Common">Common Room</option>
+            <option value="Computer">Computer Room</option>
+            <option value="Elevators">Elevators</option>
+            <option value="GameTables">Game Table</option>
+            <option value="Kitchen">Kitchen</option>
+            <option value="Laundry">Laundry</option>
+            <option value="Music">Music Practice Room</option>
+            <option value="Printer">Printer</option>
+            <option value="Special">Special</option>
+            <option value="Study">Study Room</option>
+            <option value="RecyclingCompost">Recycling, Compost, and Waste Disposal</option>            
+            <option value="VendingMachines">Vending Machines</option>
+            
+            
+              
+          </select>          
+        </div>
+        <div id='results'></div>        
+      </div>      
+    </div>    
+  </div>
+  <!-- /.calcite-panels -->
+
+  <script type="text/javascript">
+    var dojoConfig = {
+      packages: [{
+        name: "bootstrap",
+        location: "https://esri.github.io/calcite-maps/dist/vendor/dojo-bootstrap"
+      },
+      {
+        name: "calcite-maps",
+        location: "https://esri.github.io/calcite-maps/dist/js/dojo"
+      }]
+    };
+  </script>
+
+  <!-- ArcGIS JS 4 -->
+  <script src="https://js.arcgis.com/4.3/"></script>
+  <script src="js/fdo.js"></script>  
 </body>
-
 </html>

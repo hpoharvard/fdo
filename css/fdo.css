@@ -1,22 +1,16 @@
-html,body,
-#viewDiv {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+html,body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	font-family: "Gotham", Sans-serif;
 }
 
-#infoDiv {
-  background-color: rgba(255, 255, 255, 0.8);
-  color: black;
-  padding: 6px;
-  width: 260px;
-  border-radius: 5px;
+.esri-view-height-xsmall .esri-ui-corner .esri-legend {
+    max-height: 440px;
 }
 
 #results {
-  padding: 6px;
-  font-weight: normal;
-  font: 13.3333px Arial;
-
+  margin-left: 16px;
+  /*font-weight: normal;
+  font: 13.3333px Arial;*/
 }
