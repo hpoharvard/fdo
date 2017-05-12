@@ -14,7 +14,7 @@ require([
 
       // Bootstrap
       "bootstrap/Dropdown",
-      "bootstrap/Collapse",
+      "bootstrap/Collapse",      
 
       // Calcite Maps
       "calcite-maps/calcitemaps-v0.3",
@@ -66,20 +66,35 @@ require([
       });
       
       //view.ui.add("infoDiv", "top-right");
+      view.watch("widthBreakpoint", function(newVal){
+        if (newVal === "xsmall"){
+          console.log('xsmall')
+          view.zoom = 16;
+            // clear the view's default UI components if
+          // app is used on a mobile device
+          //view.ui.components = [];
+        }
+      });
 
       // add on mouse click on a map     
       view.on("click", function(evt) {
         var amenities = document.getElementById("infoAmenities");            
         amenities.options[0].selected = true;
         var screenPoint = evt.screenPoint;
-        view.hitTest(screenPoint).then(getSingleBuilding);
+        view.hitTest(screenPoint).then(getSingleBuilding);        
+        document.getElementById("alert_placeholder").style.visibility = "visible";        
       });
 
-      
+    document.getElementById("alert_placeholder").addEventListener("click", function(){      
+      this.style.visibility = "hidden"; 
+
+    });
+          
       function getSingleBuilding(response) {
         resultsLayer.removeAll();
         var graphic = response.results[0].graphic;
         var attributes = graphic.attributes;
+        console.log(attributes)
         var name = attributes.Primary_Building_Name
         
         var pGraphic = new Graphic({
@@ -95,7 +110,7 @@ require([
         });
         
         resultsLayer.add(pGraphic);
-        
+
         var bArray = [];        
         var bArrayNew = [];
         var obj = attributes;
@@ -113,15 +128,16 @@ require([
         for (var a in bArray){
           bArrayNew.push(bArray[a].replace(": Yes",""))
         }
+
+        bArrayNew.sort();
         
         if (bArrayNew.length  == 0) {
-          document.getElementById("results").innerHTML = '';
-          document.getElementById("results").innerHTML = 'There are not amenities in this building!';                    
+          document.getElementById("alert_placeholder").innerHTML = '';
+          document.getElementById("alert_placeholder").innerHTML = 'There are not amenities in this building!';                    
         }
-        else{  
-          document.getElementById("results").innerHTML = '';
-          document.getElementById("results").innerHTML = 'List of amenities:';          
-          document.getElementById('results').appendChild(makeUL(bArrayNew));
+        else{            
+          document.getElementById("alert_placeholder").innerHTML = '';
+          document.getElementById("alert_placeholder").innerHTML = 'List of amenities: <b>' + bArrayNew.toString().replace(/,/g, ', ') + "</b>";                    
         }
       }  
               
@@ -147,8 +163,9 @@ require([
       }
 
       function displayResults(results) {
-        document.getElementById("results").innerHTML = '';
-        document.getElementById("results").innerHTML = 'List of buildings:';
+        document.getElementById("alert_placeholder").style.visibility = "visible"; 
+        document.getElementById("alert_placeholder").innerHTML = '';        
+        
         resultsLayer.removeAll();
         console.log(results)
         var features = results.features.map(function(graphic) {
@@ -168,7 +185,8 @@ require([
           bArray.push(results.features[i].attributes.Primary_Building_Name) 
         };
 
-        document.getElementById('results').appendChild(makeUL(bArray.sort()));
+        document.getElementById("alert_placeholder").innerHTML = 'List of dormitory: <b>' + bArray.sort().toString().replace(/,/g, ', ') + '</b>';                    
+        //document.getElementById('results').appendChild(makeUL(bArray.sort()));
         resultsLayer.addMany(features);
       }        
       
@@ -189,8 +207,7 @@ require([
       }
 
       function displayResultsDorms(results) {        
-        //document.getElementById("results").innerHTML = '';
-        //document.getElementById("results").innerHTML = 'List of buildings:';
+        document.getElementById("alert_placeholder").style.visibility = "visible"; 
         resultsLayer.removeAll();
 
         var features = results.features.map(function(graphic) {
@@ -224,20 +241,27 @@ require([
         }
         //console.log(bArrayNew)
         if (bArrayNew.length  == 0) {
-          document.getElementById("results").innerHTML = '';
-          document.getElementById("results").innerHTML = 'There are not amenities in this building!';                    
+          document.getElementById("alert_placeholder").innerHTML = '';
+          document.getElementById("alert_placeholder").innerHTML = 'There are not amenities in this building!';                    
         }
         else{  
-          document.getElementById("results").innerHTML = '';
-          document.getElementById("results").innerHTML = 'List of amenities:';          
-          document.getElementById('results').appendChild(makeUL(bArrayNew));
+          document.getElementById("alert_placeholder").innerHTML = '';          
+          document.getElementById("alert_placeholder").innerHTML = 'List of amenities: <b>' + bArrayNew.toString().replace(/,/g, ', ') + "</b>";                    
         }
-        //document.getElementById('results').appendChild(makeUL(bArray.sort()));
         resultsLayer.addMany(features);   
       }
 
-      // create the list to display values  
+      // create the list to display values
+      /*
       function makeUL(array) {
+        var list = "";
+        for (var member in array) {
+          list += array[member] + ", ";
+          } 
+          console.log(list)           
+        return list;
+      }*/  
+      /*function makeUL(array) {
         var list = document.createElement('ul');
         for(var i = 0; i < array.length; i++) {               
             var item = document.createElement('li');                
@@ -245,5 +269,5 @@ require([
             list.appendChild(item);
         }            
         return list;
-      }
+      }*/
     });

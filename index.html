@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <meta name="description" content="Harvard University, Arts First 2017. Web Mapping about Harvard
-  University 2017 Arts Festival">
+  <meta name="description" content="Harvard University, FDO. Web Mapping about Harvard
+  University 2017 Freshman Dean Office">
   <meta name="keywords" content="HTML, CSS, JavaScript">
   <meta name="author" content="Giovanni Zambotti">
 
@@ -40,7 +40,8 @@
       </a>
       <ul class="dropdown-menu">
         <li><a role="button" data-target="#panelInfo" aria-haspopup="true"><span class="glyphicon glyphicon-info-sign"></span> Info</a></li>        
-        <li><a role="button" data-target="#panelFilter" aria-haspopup="true"><span class="glyphicon glyphicon-filter"></span>Select a dormitory or amenity</a></li>        
+        <li><a role="button" data-target="#panelFilterDorm" aria-haspopup="true"><span class="glyphicon glyphicon-home"></span>Select a dormitory</a></li>
+        <li><a role="button" data-target="#panelFilterAmenity" aria-haspopup="true"><span class="glyphicon glyphicon-filter"></span>Select an amenity</a></li>        
         <li><a role="button" id="calciteToggleNavbar" aria-haspopup="true"><span class="glyphicon glyphicon-fullscreen"></span> Full Map</a></li>
       </ul>
     </div>
@@ -64,7 +65,10 @@
   <!-- Map  -->
 
   <div class="calcite-map calcite-map-absolute">
-    <div id="mapViewDiv"></div>
+    <div id="mapViewDiv">
+      <div id="alert_placeholder">      
+      </div>
+    </div>
   </div>
   <!-- /.calcite-map -->
 
@@ -91,13 +95,13 @@
       </div>
     </div>
     
-    <!-- Filter Panel -->
-    <div id="panelFilter" class="panel collapse in" >
+    <!-- Filter Panel Dorm-->
+    <div id="panelFilterDorm" class="panel collapse in" >
       <div id="headingFilter" class="panel-heading" role="tab">
         <div class="panel-title" style="background-color: rgb(196, 221, 250);">
           <a class="panel-toggle collapsed" role="button" data-toggle="collapse" href="#collapseFilter"
-            aria-expanded="false" aria-controls="collapseFilter"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span><span class="panel-label">Select a dormitory or amenity</span></a>
-          <a class="panel-close" role="button" data-toggle="collapse" data-target="#panelFilter"><span class="esri-icon esri-icon-close" aria-hidden="true"></span></a>
+            aria-expanded="false" aria-controls="collapseFilter"><span class="glyphicon glyphicon-home" aria-hidden="true"></span><span class="panel-label">Select a dormitory</span></a>
+          <a class="panel-close" role="button" data-toggle="collapse" data-target="#panelFilterDorm"><span class="esri-icon esri-icon-close" aria-hidden="true"></span></a>
         </div>
       </div>
       <div id="collapseFilter" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingFilter">
@@ -122,12 +126,24 @@
             <option value= "Weld Hall">Weld Hall</option>
             <option value= "Wigglesworth Hall A">Wigglesworth Hall A-D</option>
             <option value= "Wigglesworth Hall B">Wigglesworth Hall E-I</option>
-            <option value= "Wigglesworth Hall C">Wigglesworth Hall J-K</option>
-              
+            <option value= "Wigglesworth Hall C">Wigglesworth Hall J-K</option>              
           </select>
+        </div>        
+        <div id='results'></div>        
+      </div>      
+    </div>
+
+    <div id="panelFilterAmenity" class="panel collapse in" >
+      <div id="headingFilter" class="panel-heading" role="tab">
+        <div class="panel-title" style="background-color: rgb(196, 221, 250);">
+          <a class="panel-toggle collapsed" role="button" data-toggle="collapse" href="#collapseFilter"
+            aria-expanded="false" aria-controls="collapseFilter"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span><span class="panel-label">Select an amenity</span></a>
+          <a class="panel-close" role="button" data-toggle="collapse" data-target="#panelFilterAmenity"><span class="esri-icon esri-icon-close" aria-hidden="true"></span></a>
         </div>
+      </div>
+      <div id="collapseFilter" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingFilter">
         <div class="panel-body">
-          <select id="infoAmenities" class="form-control">
+           <select id="infoAmenities" class="form-control">
             <option selected disabled hidden>Select an amenities...</option>
             <option value="Common">Common Room</option>
             <option value="Computer">Computer Room</option>
@@ -140,15 +156,14 @@
             <option value="Special">Special</option>
             <option value="Study">Study Room</option>
             <option value="RecyclingCompost">Recycling, Compost, and Waste Disposal</option>            
-            <option value="VendingMachines">Vending Machines</option>
-            
-            
-              
-          </select>          
-        </div>
+            <option value="VendingMachines">Vending Machines</option>              
+          </select>  
+        </div>        
         <div id='results'></div>        
       </div>      
-    </div>    
+    </div>
+
+
   </div>
   <!-- /.calcite-panels -->
 
@@ -165,7 +180,7 @@
     };
   </script>
 
-  <!-- ArcGIS JS 4 -->
+  <!-- ArcGIS JS 4 -->  
   <script src="https://js.arcgis.com/4.3/"></script>
   <script src="js/fdo.js"></script>  
 </body>

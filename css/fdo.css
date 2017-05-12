@@ -2,6 +2,7 @@ html,body {
 	margin: 0;
 	padding: 0;
 	height: 100%;
+	width: 100%;
 	font-family: "Gotham", Sans-serif;
 }
 
@@ -9,8 +10,14 @@ html,body {
     max-height: 440px;
 }
 
-#results {
-  margin-left: 16px;
-  /*font-weight: normal;
-  font: 13.3333px Arial;*/
-}
+#alert_placeholder{
+  position: fixed;
+  top: 65px;
+  left: 50px;  
+  z-index: 50;
+  visibility: hidden;   
+  background-color: rgb(196, 221, 250);
+  padding: 10px;
+  max-width: 260px;
+  word-wrap: break-word; 
+ }
