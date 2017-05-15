@@ -23,6 +23,32 @@ require([
     ], function(Map, MapView, FeatureLayer, GraphicsLayer,Graphic, MapImageLayer, TileLayer, SimpleRenderer, SimpleMarkerSymbol, 
       SimpleFillSymbol, UniqueValueRenderer) {
 
+      var myzoom = 18, lon = -71.116076, lat = 42.37375;
+
+      var isMobile = {
+          Android: function() {
+              return navigator.userAgent.match(/Android/i);
+          },
+          BlackBerry: function() {
+              return navigator.userAgent.match(/BlackBerry/i);
+          },
+          iOS: function() {
+              return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+          },
+          Opera: function() {
+              return navigator.userAgent.match(/Opera Mini/i);
+          },
+          Windows: function() {
+              return navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/WPDesktop/i);
+          },
+          any: function() {
+              return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+          }
+      };
+
+      if( isMobile.any() ) {myzoom = 17; lon = -71.117086, lat = 42.37375;};
+
+
       var fdoUrl = "https://map.harvard.edu/arcgis/rest/services/FDO/fdo/MapServer/0";
       var layerBuildingTextUrl = "https://map.harvard.edu/arcgis/rest/services/MapText/MapServer";
       var layerbaseUrl = "https://map.harvard.edu/arcgis/rest/services/AerialBase/MapServer"
@@ -52,19 +78,20 @@ require([
 
       var map = new Map({
         basemap: "topo",
-        layers: [fdoLayer, resultsLayer]
-        //layers: [fdoLayer, resultsLayer, layerBuildingText]
+        layers: [fdoLayer, resultsLayer]        
       });
+
+      
 
       var view = new MapView({
         container: "mapViewDiv",
         map: map,
-        center: [-71.116076, 42.37375], /*-71.11607611178287, 42.37410778220068*/
-        zoom: 18,
+        center: [lon, lat], /*-71.11607611178287, 42.37410778220068*/
+        zoom: myzoom,
         padding: {top: 50, bottom: 0}, 
         breakpoints: {xsmall: 768, small: 769, medium: 992, large: 1200}
-      });
-      
+      });      
+
       //view.ui.add("infoDiv", "top-right");
       view.watch("widthBreakpoint", function(newVal){
         if (newVal === "xsmall"){
