@@ -93,7 +93,7 @@ require([
       });      
 
       //view.ui.add("infoDiv", "top-right");
-      view.watch("widthBreakpoint", function(newVal){
+      /*view.watch("widthBreakpoint", function(newVal){
         if (newVal === "xsmall"){
           console.log('xsmall')
           view.zoom = 16;
@@ -101,7 +101,7 @@ require([
           // app is used on a mobile device
           //view.ui.components = [];
         }
-      });
+      });*/
 
       // add on mouse click on a map     
       view.on("click", function(evt) {
@@ -160,11 +160,12 @@ require([
         
         if (bArrayNew.length  == 0) {
           document.getElementById("alert_placeholder").innerHTML = '';
-          document.getElementById("alert_placeholder").innerHTML = 'There are not amenities in this building!';                    
+          document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'There are not amenities in this building!';
+
         }
         else{            
           document.getElementById("alert_placeholder").innerHTML = '';
-          document.getElementById("alert_placeholder").innerHTML = 'List of amenities: <b>' + bArrayNew.toString().replace(/,/g, ', ') + "</b>";                    
+          document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'List of amenities: <b>' + bArrayNew.toString().replace(/,/g, ', ') + "</b>";                    
         }
       }  
               
