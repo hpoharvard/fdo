@@ -213,7 +213,7 @@ require([
           bArray.push(results.features[i].attributes.Primary_Building_Name) 
         };
 
-        document.getElementById("alert_placeholder").innerHTML = 'List of dormitory: <b>' + bArray.sort().toString().replace(/,/g, ', ') + '</b>';                    
+        document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'List of dormitory: <b>' + bArray.sort().toString().replace(/,/g, ', ') + '</b>';                    
         //document.getElementById('results').appendChild(makeUL(bArray.sort()));
         resultsLayer.addMany(features);
       }        
@@ -270,11 +270,11 @@ require([
         //console.log(bArrayNew)
         if (bArrayNew.length  == 0) {
           document.getElementById("alert_placeholder").innerHTML = '';
-          document.getElementById("alert_placeholder").innerHTML = 'There are not amenities in this building!';                    
+          document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'There are not amenities in this building!';                    
         }
         else{  
           document.getElementById("alert_placeholder").innerHTML = '';          
-          document.getElementById("alert_placeholder").innerHTML = 'List of amenities: <b>' + bArrayNew.toString().replace(/,/g, ', ') + "</b>";                    
+          document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'List of amenities: <b>' + bArrayNew.toString().replace(/,/g, ', ') + "</b>";                    
         }
         resultsLayer.addMany(features);   
       }
