@@ -23,7 +23,7 @@ require([
     ], function(Map, MapView, FeatureLayer, GraphicsLayer,Graphic, MapImageLayer, TileLayer, SimpleRenderer, SimpleMarkerSymbol, 
       SimpleFillSymbol, UniqueValueRenderer) {
 
-      var myzoom = 18, lon = -71.116076, lat = 42.37375;
+      var myzoom = 17, lon = -71.116076, lat = 42.37375;
 
       var isMobile = {
           Android: function() {
@@ -81,8 +81,6 @@ require([
         layers: [fdoLayer, resultsLayer]        
       });
 
-      
-
       var view = new MapView({
         container: "mapViewDiv",
         map: map,
@@ -91,18 +89,7 @@ require([
         padding: {top: 50, bottom: 0}, 
         breakpoints: {xsmall: 768, small: 769, medium: 992, large: 1200}
       });      
-
-      //view.ui.add("infoDiv", "top-right");
-      /*view.watch("widthBreakpoint", function(newVal){
-        if (newVal === "xsmall"){
-          console.log('xsmall')
-          view.zoom = 16;
-            // clear the view's default UI components if
-          // app is used on a mobile device
-          //view.ui.components = [];
-        }
-      });*/
-
+      
       // add on mouse click on a map     
       view.on("click", function(evt) {
         var amenities = document.getElementById("infoAmenities");            
@@ -112,10 +99,9 @@ require([
         document.getElementById("alert_placeholder").style.visibility = "visible";        
       });
 
-    document.getElementById("alert_placeholder").addEventListener("click", function(){      
-      this.style.visibility = "hidden"; 
-
-    });
+      document.getElementById("alert_placeholder").addEventListener("click", function(){      
+        this.style.visibility = "hidden"; 
+      });
           
       function getSingleBuilding(response) {
         resultsLayer.removeAll();
@@ -146,17 +132,21 @@ require([
           // skip loop if the property is from prototype
           if(!obj.hasOwnProperty(key)) continue;            
           if(typeof obj[key] !== 'object'){
-            if((key == 'Laundry' || key == 'Music' || key == 'Kitchen' || key == 'Common' || key == 'Study' || key == 'Computer' ||  key == 'Printer' || key == 'Elevators' || key == 'VendingMachines' || key == 'RecyclingCompost' || key == 'GameTables' || key == 'Special') && obj[key] != 'No' && obj[key] != null ){
+            if((key == 'BottleFiller' || key == 'CommonRoom' || key == 'ComputerRoom' || key == 'Elevator' || key == 'GameTable' || key == 'Kitchen' || key == 'Laundry' || key == 'MusicPracticeRoom' || key == 'Printer' || key == 'Special' || key == 'StudyRoom' || key == 'RecyclingCompostWasteDisposal' || key == 'VendingMachines') && obj[key] != 'No' && obj[key] != null ){
                 bArray.push(key.split(/(?=[A-Z])/).join(" ") + ": " + obj[key])
             }              
           }
         }
 
-        for (var a in bArray){
-          bArrayNew.push(bArray[a].replace(": Yes",""))
-        }
+        for (var a in bArray){bArrayNew.push(bArray[a].replace(": Yes",""))}
 
         bArrayNew.sort();
+        //console.log(bArrayNew);
+
+        bArrayNew.forEach(function(part, index) {
+          if(part == 'Recycling Compost Waste Disposal'){bArrayNew[index] = "Recycling, Compost, and Waste Disposal";}
+        });
+        
         
         if (bArrayNew.length  == 0) {
           document.getElementById("alert_placeholder").innerHTML = '';
@@ -213,6 +203,10 @@ require([
           bArray.push(results.features[i].attributes.Primary_Building_Name) 
         };
 
+        bArray.forEach(function(part, index) {
+          if(part == 'Recycling Compost Waste Disposal'){bArray[index] = "Recycling, Compost, and Waste Disposal";}
+        });
+
         document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'List of dormitory: <b>' + bArray.sort().toString().replace(/,/g, ', ') + '</b>';                    
         //document.getElementById('results').appendChild(makeUL(bArray.sort()));
         resultsLayer.addMany(features);
@@ -259,7 +253,8 @@ require([
           console.log(key)
           if(!obj.hasOwnProperty(key)) continue;            
           if(typeof obj[key] !== 'object'){
-            if((key == 'Laundry' || key == 'Music' || key == 'Kitchen' || key == 'Common' || key == 'Study' || key == 'Computer' ||  key == 'Printer' || key == 'Elevators' || key == 'VendingMachines' || key == 'RecyclingCompost' || key == 'GameTables' || key == 'Special') && obj[key] != 'No' && obj[key] != null ){
+            if((key == 'BottleFiller' || key == 'CommonRoom' || key == 'ComputerRoom' || key == 'Elevator' || key == 'GameTable' || key == 'Kitchen' || key == 'Laundry' || key == 'MusicPracticeRoom' || key == 'Printer' || key == 'Special' || key == 'StudyRoom' || key == 'RecyclingCompostWasteDisposal' || key == 'VendingMachines') && obj[key] != 'No' && obj[key] != null ){
+            //if((key == 'Laundry' || key == 'Music' || key == 'Kitchen' || key == 'Common' || key == 'Study' || key == 'Computer' ||  key == 'Printer' || key == 'Elevators' || key == 'VendingMachines' || key == 'RecyclingCompost' || key == 'GameTables' || key == 'Special') && obj[key] != 'No' && obj[key] != null ){
                 bArray.push(key.split(/(?=[A-Z])/).join(" ") + ": " + obj[key])
             }              
           }
@@ -267,6 +262,10 @@ require([
         for (var a in bArray){
           bArrayNew.push(bArray[a].replace(": Yes",""))
         }
+        bArrayNew.forEach(function(part, index) {
+          if(part == 'Recycling Compost Waste Disposal'){bArrayNew[index] = "Recycling, Compost, and Waste Disposal";}
+        });
+        
         //console.log(bArrayNew)
         if (bArrayNew.length  == 0) {
           document.getElementById("alert_placeholder").innerHTML = '';
