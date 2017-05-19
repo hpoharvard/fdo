@@ -5,8 +5,8 @@ require([
       "esri/layers/FeatureLayer",
       "esri/layers/GraphicsLayer",
       "esri/Graphic",
-      "esri/layers/MapImageLayer",
-      "esri/layers/TileLayer",
+      //"esri/layers/MapImageLayer",
+      //"esri/layers/TileLayer",
       "esri/renderers/SimpleRenderer",
       "esri/symbols/SimpleMarkerSymbol",
       "esri/symbols/SimpleFillSymbol",
@@ -20,9 +20,10 @@ require([
       "calcite-maps/calcitemaps-v0.3",
 
       "dojo/domReady!"
-    ], function(Map, MapView, FeatureLayer, GraphicsLayer,Graphic, MapImageLayer, TileLayer, SimpleRenderer, SimpleMarkerSymbol, 
-      SimpleFillSymbol, UniqueValueRenderer) {
-
+    ], //function(Map, MapView, FeatureLayer, GraphicsLayer,Graphic, MapImageLayer, TileLayer, SimpleRenderer, SimpleMarkerSymbol, 
+      //SimpleFillSymbol, UniqueValueRenderer) {
+      function(Map, MapView, FeatureLayer, GraphicsLayer, Graphic, SimpleRenderer, SimpleMarkerSymbol, 
+      SimpleFillSymbol, UniqueValueRenderer) {  
       var myzoom = 17, lon = -71.116076, lat = 42.37375;
 
       var isMobile = {
@@ -50,11 +51,11 @@ require([
 
 
       var fdoUrl = "https://map.harvard.edu/arcgis/rest/services/FDO/fdo/MapServer/0";
-      var layerBuildingTextUrl = "https://map.harvard.edu/arcgis/rest/services/MapText/MapServer";
-      var layerbaseUrl = "https://map.harvard.edu/arcgis/rest/services/AerialBase/MapServer"
-      var layerbase = new TileLayer({url: layerbaseUrl});
-      var renderer;
-      var layerBuildingText = new MapImageLayer(layerBuildingTextUrl);
+      //var layerBuildingTextUrl = "https://map.harvard.edu/arcgis/rest/services/MapText/MapServer";
+      //var layerbaseUrl = "https://map.harvard.edu/arcgis/rest/services/AerialBase/MapServer"
+      //var layerbase = new TileLayer({url: layerbaseUrl});
+      //var renderer;
+      //var layerBuildingText = new MapImageLayer(layerBuildingTextUrl);
 
       var buildingRenderer = new SimpleRenderer({
         symbol: new SimpleFillSymbol({
@@ -145,13 +146,11 @@ require([
 
         bArrayNew.forEach(function(part, index) {
           if(part == 'Recycling Compost Waste Disposal'){bArrayNew[index] = "Recycling, Compost, and Waste Disposal";}
-        });
-        
+        });        
         
         if (bArrayNew.length  == 0) {
           document.getElementById("alert_placeholder").innerHTML = '';
           document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'There are not amenities in this building!';
-
         }
         else{            
           document.getElementById("alert_placeholder").innerHTML = '';
