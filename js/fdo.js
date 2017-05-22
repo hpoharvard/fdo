@@ -2,6 +2,8 @@
 require([
       "esri/Map",
       "esri/views/MapView",
+      "esri/widgets/Home",
+      "esri/widgets/Locate",
       "esri/layers/FeatureLayer",
       "esri/layers/GraphicsLayer",
       "esri/Graphic",
@@ -11,6 +13,7 @@ require([
       "esri/symbols/SimpleMarkerSymbol",
       "esri/symbols/SimpleFillSymbol",
       "esri/renderers/UniqueValueRenderer",
+      "esri/widgets/Compass",
 
       // Bootstrap
       "bootstrap/Dropdown",
@@ -22,8 +25,8 @@ require([
       "dojo/domReady!"
     ], //function(Map, MapView, FeatureLayer, GraphicsLayer,Graphic, MapImageLayer, TileLayer, SimpleRenderer, SimpleMarkerSymbol, 
       //SimpleFillSymbol, UniqueValueRenderer) {
-      function(Map, MapView, FeatureLayer, GraphicsLayer, Graphic, SimpleRenderer, SimpleMarkerSymbol, 
-      SimpleFillSymbol, UniqueValueRenderer) {  
+      function(Map, MapView, Home, Locate, FeatureLayer, GraphicsLayer, Graphic, SimpleRenderer, SimpleMarkerSymbol, 
+      SimpleFillSymbol, UniqueValueRenderer, Compass) {  
       var myzoom = 17, lon = -71.116076, lat = 42.37375;
 
       var isMobile = {
@@ -89,8 +92,41 @@ require([
         zoom: myzoom,
         padding: {top: 50, bottom: 0}, 
         breakpoints: {xsmall: 768, small: 769, medium: 992, large: 1200}
-      });      
+      });
       
+      /********************************
+      * Create a home widget object.
+      *********************************/
+
+      var homeBtn = new Home({
+        view: view
+      });
+
+      // Add the home button to the top left corner of the view
+      view.ui.add(homeBtn, "top-left");      
+      
+      /********************************
+      * Create a compass widget object.
+      *********************************/
+
+      var compassWidget = new Compass({view: view});
+      // Add the Compass widget to the top left corner of the view
+      view.ui.add(compassWidget, "top-left");
+      
+      /********************************
+      * Create a locate widget object.
+      *********************************/        
+      var locateBtn = new Locate({
+        view: view
+      });
+
+      // Add the locate widget to the top left corner of the view
+      view.ui.add(locateBtn, {
+        position: "top-left"
+      });
+
+
+
       // add on mouse click on a map     
       view.on("click", function(evt) {
         var amenities = document.getElementById("infoAmenities");            
