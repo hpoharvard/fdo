@@ -1,8 +1,7 @@
 // code by Giovanni Zambotti - May 2017
 require([
       "esri/Map",
-      "esri/views/MapView",
-      "esri/widgets/Home",
+      "esri/views/MapView",      
       "esri/widgets/Locate",
       "esri/layers/FeatureLayer",
       "esri/layers/GraphicsLayer",
@@ -13,7 +12,7 @@ require([
       "esri/symbols/SimpleMarkerSymbol",
       "esri/symbols/SimpleFillSymbol",
       "esri/renderers/UniqueValueRenderer",
-      "esri/widgets/Compass",
+      "esri/geometry/Extent",
 
       // Bootstrap
       "bootstrap/Dropdown",
@@ -25,9 +24,14 @@ require([
       "dojo/domReady!"
     ], //function(Map, MapView, FeatureLayer, GraphicsLayer,Graphic, MapImageLayer, TileLayer, SimpleRenderer, SimpleMarkerSymbol, 
       //SimpleFillSymbol, UniqueValueRenderer) {
-      function(Map, MapView, Home, Locate, FeatureLayer, GraphicsLayer, Graphic, SimpleRenderer, SimpleMarkerSymbol, 
-      SimpleFillSymbol, UniqueValueRenderer, Compass) {  
+      function(Map, MapView, Locate, FeatureLayer, GraphicsLayer, Graphic, SimpleRenderer, SimpleMarkerSymbol, 
+      SimpleFillSymbol, UniqueValueRenderer, Extent) {  
       var myzoom = 17, lon = -71.116076, lat = 42.37375;
+
+      var xMax = -7915458.81211143;
+      var xMin = -7917751.9229597915;
+      var yMax = 5217414.497463334;
+      var yMin = 5216847.191394078;      
 
       var isMobile = {
           Android: function() {
@@ -50,7 +54,15 @@ require([
           }
       };
 
-      if( isMobile.any() ) {myzoom = 17; lon = -71.117086, lat = 42.37375;};
+      if( isMobile.any() ) {
+        myzoom = 16; 
+        lon = -71.116286; 
+        lat = 42.37175;
+        xMax = -7916229.045165166; 
+        xMin = -7917088.961733397;
+        yMax = 5217530.483504136;
+        yMin = 5216121.17579509;
+      };
 
 
       var fdoUrl = "https://map.harvard.edu/arcgis/rest/services/FDO/fdo/MapServer/0";
@@ -89,51 +101,30 @@ require([
         container: "mapViewDiv",
         map: map,
         center: [lon, lat], /*-71.11607611178287, 42.37410778220068*/
-        zoom: myzoom,
+        zoom: myzoom,        
         padding: {top: 50, bottom: 0}, 
         breakpoints: {xsmall: 768, small: 769, medium: 992, large: 1200}
       });
-      
-      /********************************
-      * Create a home widget object.
-      *********************************/
 
-      var homeBtn = new Home({
-        view: view
-      });
-
-      // Add the home button to the top left corner of the view
-      view.ui.add(homeBtn, "top-left");      
-      
-      /********************************
-      * Create a compass widget object.
-      *********************************/
-
-      var compassWidget = new Compass({view: view});
-      // Add the Compass widget to the top left corner of the view
-      view.ui.add(compassWidget, "top-left");
-      
+      // Disables map rotation
+        view.constraints = {rotationEnabled: false};
+                  
       /********************************
       * Create a locate widget object.
       *********************************/        
-      var locateBtn = new Locate({
-        view: view
-      });
+      var locateBtn = new Locate({view: view});
 
       // Add the locate widget to the top left corner of the view
-      view.ui.add(locateBtn, {
-        position: "top-left"
-      });
-
-
+      view.ui.add(locateBtn, {position: "top-left"});
 
       // add on mouse click on a map     
       view.on("click", function(evt) {
+        //view.extent = new Extent({ xmin: xMin, ymin: yMin, xmax: xMax, ymax: yMax, spatialReference: 102100});
         var amenities = document.getElementById("infoAmenities");            
         amenities.options[0].selected = true;
         var screenPoint = evt.screenPoint;
         view.hitTest(screenPoint).then(getSingleBuilding);        
-        document.getElementById("alert_placeholder").style.visibility = "visible";        
+        //document.getElementById("alert_placeholder").style.visibility = "visible";        
       });
 
       document.getElementById("alert_placeholder").addEventListener("click", function(){      
@@ -141,6 +132,7 @@ require([
       });
           
       function getSingleBuilding(response) {
+        
         resultsLayer.removeAll();
         var graphic = response.results[0].graphic;
         var attributes = graphic.attributes;
@@ -185,12 +177,27 @@ require([
         });        
         
         if (bArrayNew.length  == 0) {
-          document.getElementById("alert_placeholder").innerHTML = '';
-          document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'There are not amenities in this building!';
+          //document.getElementById("alert_placeholder").innerHTML = '';
+          //document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'There are not amenities in this building!';
+          //document.getElementById("panelInfo").className = 'panel collapse in'
+          //document.getElementById("panelFilterDorm").className = 'panel collapse in'
+          //document.getElementById("panelFilterAmenity").className = 'panel collapse in'
+          //this.setDropdownItemEvents();
+          document.getElementsByClassName('panel-label')[0].innerHTML = "List of amenities:"
+          document.getElementById("foo").innerHTML = '';
+          document.getElementById("foo").innerHTML = 'There are not amenities in this building!';
+        
         }
         else{            
-          document.getElementById("alert_placeholder").innerHTML = '';
-          document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'List of amenities: <b>' + bArrayNew.toString().replace(/,/g, ', ') + "</b>";                    
+          //document.getElementById("alert_placeholder").innerHTML = '';
+          //document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + '<b>List of amenities: </b>' + bArrayNew.toString().replace(/,/g, ', ');                    
+          //document.getElementById("panelInfo").className = 'panel collapse in'
+          //this.setDropdownItemEvents();
+          document.getElementsByClassName('panel-label')[0].innerHTML = "List of amenities:"
+          document.getElementById("foo").innerHTML = '';
+          //document.getElementById("foo").innerHTML = '<b>List of amenities: </b>' + bArrayNew.toString().replace(/,/g, ', ');                    
+          document.getElementById("foo").innerHTML = bArrayNew.toString().replace(/,/g, ', ');
+                
         }
       }  
               
@@ -216,8 +223,9 @@ require([
       }
 
       function displayResults(results) {
-        document.getElementById("alert_placeholder").style.visibility = "visible"; 
-        document.getElementById("alert_placeholder").innerHTML = '';        
+        //document.getElementById("alert_placeholder").style.visibility = "visible"; 
+        //document.getElementById("alert_placeholder").innerHTML = ''; 
+        view.extent = new Extent({ xmin: xMin, ymin: yMin, xmax: xMax, ymax: yMax, spatialReference: 102100});       
         
         resultsLayer.removeAll();
         console.log(results)
@@ -242,7 +250,10 @@ require([
           if(part == 'Recycling Compost Waste Disposal'){bArray[index] = "Recycling, Compost, and Waste Disposal";}
         });
 
-        document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'List of dormitory: <b>' + bArray.sort().toString().replace(/,/g, ', ') + '</b>';                    
+        //document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + '<b>List of dormitory: </b>' + bArray.sort().toString().replace(/,/g, ', ');                    
+        document.getElementsByClassName('panel-label')[0].innerHTML = "List of dormitories:";
+        document.getElementById("foo").innerHTML = bArray.sort().toString().replace(/,/g, ', ');                    
+        //document.getElementById("foo").innerHTML = '<b>List of dormitory: </b>' + bArray.sort().toString().replace(/,/g, ', ');                    
         //document.getElementById('results').appendChild(makeUL(bArray.sort()));
         resultsLayer.addMany(features);
       }        
@@ -251,6 +262,7 @@ require([
       var dorms = document.getElementById("infoDorms");
 
       dorms.addEventListener("change", function() {
+        view.extent = new Extent({ xmin: xMin, ymin: yMin, xmax: xMax, ymax: yMax, spatialReference: 102100});
         var selectedDorms = dorms.options[dorms.selectedIndex].value;
         queryFdoDorms(selectedDorms).then(displayResultsDorms);
         var amenities = document.getElementById("infoAmenities");            
@@ -264,7 +276,7 @@ require([
       }
 
       function displayResultsDorms(results) {        
-        document.getElementById("alert_placeholder").style.visibility = "visible"; 
+        //document.getElementById("alert_placeholder").style.visibility = "visible"; 
         resultsLayer.removeAll();
 
         var features = results.features.map(function(graphic) {
@@ -303,12 +315,18 @@ require([
         
         //console.log(bArrayNew)
         if (bArrayNew.length  == 0) {
-          document.getElementById("alert_placeholder").innerHTML = '';
-          document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'There are not amenities in this building!';                    
+          //document.getElementById("alert_placeholder").innerHTML = '';
+          //document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'There are not amenities in this building!';                    
+          document.getElementsByClassName('panel-label')[0].innerHTML = "List of amenities:"
+          document.getElementById("foo").innerHTML = '';
+          document.getElementById("foo").innerHTML = 'There are not amenities in this building!';                    
         }
         else{  
-          document.getElementById("alert_placeholder").innerHTML = '';          
-          document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'List of amenities: <b>' + bArrayNew.toString().replace(/,/g, ', ') + "</b>";                    
+          //document.getElementById("alert_placeholder").innerHTML = '';          
+          //document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + '<b>List of amenities: </b>' + bArrayNew.toString().replace(/,/g, ', ');                    
+          document.getElementsByClassName('panel-label')[0].innerHTML = "List of amenities:"
+          document.getElementById("foo").innerHTML = '';
+          document.getElementById("foo").innerHTML = bArrayNew.toString().replace(/,/g, ', ');                    
         }
         resultsLayer.addMany(features);   
       }

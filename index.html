@@ -39,9 +39,9 @@
         </div>
       </a>
       <ul class="dropdown-menu">
-        <li><a role="button" data-target="#panelInfo" aria-haspopup="true"><span class="glyphicon glyphicon-info-sign"></span> Info</a></li>        
-        <li><a role="button" data-target="#panelFilterDorm" aria-haspopup="true"><span class="glyphicon glyphicon-home"></span>Select a dormitory</a></li>
-        <li><a role="button" data-target="#panelFilterAmenity" aria-haspopup="true"><span class="glyphicon glyphicon-filter"></span>Select an amenity</a></li>        
+        <li><a role="button" data-target="#panelInfo" aria-haspopup="false"><span class="glyphicon glyphicon-info-sign"></span> Info</a></li>        
+        <li><a role="button" data-target="#panelFilterDorm" aria-haspopup="false"><span class="glyphicon glyphicon-home"></span>Select a dormitory</a></li>
+        <li><a role="button" data-target="#panelFilterAmenity" aria-haspopup="false"><span class="glyphicon glyphicon-filter"></span>Select an amenity</a></li>        
         <li><a role="button" id="calciteToggleNavbar" aria-haspopup="true"><span class="glyphicon glyphicon-fullscreen"></span> Full Map</a></li>
       </ul>
     </div>
@@ -77,20 +77,22 @@
   <div class="calcite-panels calcite-panels-right calcite-text-dark calcite-bg-dark panel-group" style="background-color: rgb(196, 221, 250);">
 
     <!-- Info Panel -->
-    <div id="panelInfo" class="panel collapse">
+    <div id="panelInfo" class="panel collapse in">
       <div id="headingInfo" class="panel-heading" role="tab">
         <div class="panel-title" style="background-color: rgb(196, 221, 250);">
           <a class="panel-toggle collapsed" role="button" data-toggle="collapse" href="#collapseInfo"
             aria-expanded="false" aria-controls="collapseInfo"><span class="glyphicon glyphicon-info-sign
 " aria-hidden="true"></span><span class="panel-label">Info</span></a>
           <a class="panel-close" role="button" data-toggle="collapse" data-target="#panelInfo"><span class="esri-icon esri-icon-close" aria-hidden="true"></span></a>
+
         </div>
       </div>
       <div id="collapseInfo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingInfo">
-        <div class="panel-body">
-        <p> 
-        <a class="artsinfo" href="http://ofa.fas.harvard.edu/arts" target="_blank">More info here!</a>
-        </p>          
+        <div id="foo" class="panel-body">
+        Click on a building blue shape to see the list of amenities, or select directly a dormitory or an amenity.
+        <!--
+          <p><a class="artsinfo" href="http://ofa.fas.harvard.edu/arts" target="_blank">More info here!</a></p>          
+        -->
         </div>
       </div>
     </div>
@@ -128,8 +130,7 @@
             <option value= "Wigglesworth Hall B">Wigglesworth Hall E-I</option>
             <option value= "Wigglesworth Hall C">Wigglesworth Hall J-K</option>              
           </select>
-        </div>        
-        <div id='results'></div>        
+        </div>                
       </div>      
     </div>
 
@@ -145,21 +146,21 @@
         <div class="panel-body">
            <select id="infoAmenities" class="form-control">
             <option selected disabled hidden>Select an amenities...</option>
-            <option value="Common">Common Room</option>
-            <option value="Computer">Computer Room</option>
-            <option value="Elevators">Elevators</option>
-            <option value="GameTables">Game Table</option>
+            <option value="BottleFiller">Bottle Filler</option>
+            <option value="CommonRoom">Common Room</option>
+            <option value="ComputerRoom">Computer Room</option>
+            <option value="Elevator">Elevator</option>
+            <option value="GameTable">Game Table</option>
             <option value="Kitchen">Kitchen</option>
             <option value="Laundry">Laundry</option>
-            <option value="Music">Music Practice Room</option>
+            <option value="MusicPracticeRoom">Music Practice Room</option>
             <option value="Printer">Printer</option>
             <option value="Special">Special</option>
-            <option value="Study">Study Room</option>
-            <option value="RecyclingCompost">Recycling, Compost, and Waste Disposal</option>            
-            <option value="VendingMachines">Vending Machines</option>              
+            <option value="StudyRoom">Study Room</option>
+            <option value="RecyclingCompostWasteDisposal">Recycling, Compost, and Waste Disposal</option>            
+            <option value="VendingMachine">Vending Machine</option>              
           </select>  
-        </div>        
-        <div id='results'></div>        
+        </div>                
       </div>      
     </div>
 
@@ -175,7 +176,8 @@
       },
       {
         name: "calcite-maps",
-        location: "https://esri.github.io/calcite-maps/dist/js/dojo"
+        //location: "https://esri.github.io/calcite-maps/dist/js/dojo"
+        location: "https://hpoharvard.github.io/fdo/js"
       }]
     };
   </script>
