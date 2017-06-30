@@ -12,15 +12,7 @@ html,body {
 }
 
 #alert_placeholder{
-  position: fixed;
-  top: 65px;
-  left: 50px;  
-  z-index: 50;
-  visibility: hidden;
-  background-color: rgb(196, 221, 250);
-  padding: 10px;
-  max-width: 260px;
-  word-wrap: break-word; 
+  display: hide;  
  }
 
 .close:before {
@@ -31,5 +23,30 @@ html,body {
   cursor: pointer;
   font-size: 14px;
   color: #828282;
+}
 
+img{
+  padding-top:10px;
+}
+
+ul{
+  margin:0;
+}
+
+.esri-popup__content {
+    display: flex;
+    flex-flow: column nowrap;
+    margin: 15px;
+    flex: 1 1 auto;
+    font-size: 14px;
+    font-weight: 400; 
+    overflow: auto;
+    overflow-x: hidden;
+    height: 500px;
+}
+
+.esri-popup__content p {
+    font-size: 14px;
+    line-height: 1.3em;
+    margin: 0 0 1.2em;
 }
