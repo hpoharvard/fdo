@@ -89,8 +89,7 @@
       </div>
       <div id="collapseInfo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingInfo">
         <div id="foo" class="panel-body">
-        Click on a building blue shape to see the list of amenities, or select directly a dormitory or an amenity.
-        
+        Click on a dormitory (buildings in blue) to see the list of available amenities, or select the dormitory from the list below. You can also select an amenity from the list to see which dormitories offer it.
         <!--
           <p><a class="artsinfo" href="http://ofa.fas.harvard.edu/arts" target="_blank">More info here!</a></p>          
         -->
@@ -113,6 +112,7 @@
             <option selected disabled hidden>Select a dorm...</option>
             <option value= "Apley Court at Dudley House">Apley Court</option>
             <option value= "Canaday Hall">Canaday</option>
+            <option value= "DeWolfe">DeWolfe</option>
             <option value= "Grays Hall">Grays</option>
             <option value= "Greenough Hall">Greenough</option>
             <option value= "Hollis Hall">Hollis</option>
@@ -146,7 +146,7 @@
       <div id="collapseFilter" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingFilter">
         <div class="panel-body">
            <select id="infoAmenities" class="form-control">
-            <option selected disabled hidden>Select an amenities...</option>
+            <option selected disabled hidden>Select an amenity...</option>
             <option value="BottleFiller">Bottle Filler</option>
             <option value="CommonRoom">Common Room</option>
             <option value="ComputerRoom">Computer Room</option>
@@ -154,11 +154,10 @@
             <option value="GameTable">Game Table</option>
             <option value="Kitchen">Kitchen</option>
             <option value="Laundry">Laundry</option>
-            <option value="MusicPracticeRoom">Music Practice Room</option>
-            <option value="Printer">Printer</option>
-            <option value="Special">Special</option>
+            <option value="MusicRoom">Music Practice Room</option>
+            <option value="Printer">Printer</option>            
             <option value="StudyRoom">Study Room</option>
-            <option value="RecyclingCompostWasteDisposal">Recycling, Compost, and Waste Disposal</option>            
+            <option value="RecyclingCompostStations">Recycling, Compost, and Waste Disposal</option>            
             <option value="VendingMachine">Vending Machine</option>              
           </select>  
         </div>                

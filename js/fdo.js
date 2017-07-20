@@ -70,7 +70,9 @@ require([
       var fdoUrl = "https://map.harvard.edu/arcgis/rest/services/FDO/fdo/MapServer"
       var fdoPopup = { // autocasts as new PopupTemplate()
         title: "{Dorm_Name}",
-        //content: "{url}"      
+        /*content: "<img src='https://map.harvard.edu/images/bldg_photos/{url}'</img>" + "<p>{Notes}</p>" +
+        "<ul><li>Bottle Filler: {BottleFiller}</li><li>Common Room: {CommonRoom}</li><li>Computer Room: {ComputerRoom}</li><li>Elevator: {Elevator}</li><li>Game Table: {GameTable}</li><li>Kitchen: {Kitchen}</li><li>Laundry: {Laundry}</li><li>Music Room: {MusicRoom}</li><li>Printer: {Printer}</li><li>Study Room: {StudyRoom}</li><li>Recycling Compost Stations: {RecyclingCompostStations}</li><li>Vending Machine: {VendingMachine}</li></ul>"      
+        */
       };
       //var layerBuildingTextUrl = "https://map.harvard.edu/arcgis/rest/services/MapText/MapServer";
       //var layerbaseUrl = "https://map.harvard.edu/arcgis/rest/services/AerialBase/MapServer"
@@ -110,20 +112,11 @@ require([
         center: [lon, lat], /*-71.11607611178287, 42.37410778220068*/
         zoom: myzoom,        
         padding: {top: 50, bottom: 0}, 
-        breakpoints: {xsmall: 768, small: 769, medium: 992, large: 1200},
-        /*popup: {
-          dockEnabled: true,
-          dockOptions: {
-            // Disables the dock button from the popup
-            buttonEnabled: false,
-            // Ignore the default sizes that trigger responsive docking
-            breakpoint: false,
-            position: 'bottom-right'
-          }
-        }*/
+        breakpoints: {xsmall: 768, small: 769, medium: 992, large: 1200}        
       });
       
       fdoLayer.popupTemplate = fdoPopup; 
+
       // Disables map rotation
       view.constraints = {rotationEnabled: false};
                   
@@ -135,34 +128,25 @@ require([
       // Add the locate widget to the top left corner of the view
       view.ui.add(locateBtn, {position: "top-left"});
 
-      // add on mouse click on a map     
-      view.on("click", function(evt) {        
+      // add on mouse click on a map, clear popup and open it     
+      view.on("click", function(evt) {
+        view.popup.clear();        
         document.getElementById("alert_placeholder").style.display = "none";
         
         var amenities = document.getElementById("infoAmenities");            
         amenities.options[0].selected = true;        
         var screenPoint = evt.screenPoint;
         view.hitTest(screenPoint).then(getSingleBuilding);        
-        //document.getElementById("alert_placeholder").style.visibility = "visible";
-        view.popup.content = document.getElementById("alert_placeholder").innerHTML;
-        //console.log(view.popup)           
       });
       
-      
-      /*document.getElementById("alert_placeholder").addEventListener("click", function(){      
-        this.style.visibility = "hidden"; 
-      });*/
                 
-      function getSingleBuilding(response) {        
+      function getSingleBuilding(response) {                
         resultsLayer.removeAll();
         var graphic = response.results[0].graphic;
-        var attributes = graphic.attributes;
-        
+        var attributes = graphic.attributes;        
         var name = attributes.Primary_Building_Name;        
-
         var dorms = document.getElementById("infoDorms");
-        for (var i = 0; i < dorms.options.length; i++) {
-            //console.log(name, dorms.options[i].value)
+        for (var i = 0; i < dorms.options.length; i++) {           
             if (dorms.options[i].value === name) {                
                 dorms.selectedIndex = i;
                 break;
@@ -183,54 +167,26 @@ require([
         
         resultsLayer.add(pGraphic);
 
-        var bArray = [];        
-        var bArrayNew = [];
+        var list = document.createElement('ul');
         var obj = attributes;
-        // filter the object to create a correct list  
-        for(var key in obj){
-          // skip loop if the property is from prototype
-          if(!obj.hasOwnProperty(key)) continue;            
-          if(typeof obj[key] !== 'object'){
-            if((key == 'BottleFiller' || key == 'CommonRoom' || key == 'ComputerRoom' || key == 'Elevator' || key == 'GameTable' || key == 'Kitchen' || key == 'Laundry' || key == 'MusicPracticeRoom' || key == 'Printer' || key == 'Special' || key == 'StudyRoom' || key == 'RecyclingCompostWasteDisposal' || key == 'VendingMachines' || key == 'Notes' || key == 'url') && obj[key] != 'No' && obj[key] != null ){
-                bArray.push(key.split(/(?=[A-Z])/).join(" ") + ": " + obj[key])
-            }              
+        console.log(obj)
+        for(var i in obj){
+            
+          if (obj[i] == "Yes"){
+            //delete obj[i]
+            console.log(obj[i],i);
+            var item = document.createElement('li');                
+            item.appendChild(document.createTextNode(i.split(/(?=[A-Z])/).join(" ")));               
+            list.appendChild(item);
           }
         }
-        //console.log(bArray)
-        for (var a in bArray){bArrayNew.push(bArray[a].replace(": Yes",""))}
 
-        //bArrayNew.sort();
-        //console.log(bArrayNew)
-
-        bArrayNew.forEach(function(part, index) {
-          if(part == 'Recycling Compost Waste Disposal'){bArrayNew[index] = "Recycling, Compost, and Waste Disposal";}
-        });        
+        var zimg = attributes.url;
+        var znotes = attributes.Notes;
+        var zcontent = "<img width='300px' src='https://map.harvard.edu/images/bldg_photos/" +zimg+ "'</img>" + "<p>" + znotes + "</p>" + list.outerHTML;        
         
-        if (bArrayNew.length  == 1) {
-          //document.getElementById("alert_placeholder").innerHTML = '';
-          //document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'There are not amenities in this building!';
-          //document.getElementById("panelInfo").className = 'panel collapse in'
-          //document.getElementById("panelFilterDorm").className = 'panel collapse in'
-          //document.getElementById("panelFilterAmenity").className = 'panel collapse in'          
-          //document.getElementsByClassName('panel-label')[0].innerHTML = "List of amenities:"
-          document.getElementById("alert_placeholder").innerHTML = '';
-          document.getElementById("alert_placeholder").innerHTML = 'There are not amenities in this building!';
-          
-        }
-        else{            
-          //document.getElementById("alert_placeholder").innerHTML = '';
-          //document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + '<b>List of amenities: </b>' + bArrayNew.toString().replace(/,/g, ', ');                    
-          //document.getElementById("panelInfo").className = 'panel collapse in'
-          
-          /*document.getElementsByClassName('panel-label')[0].innerHTML = "List of amenities:"
-          document.getElementById("foo").innerHTML = '';          
-          document.getElementById("foo").innerHTML = bArrayNew.toString().replace(/,/g, ', ');*/
-          
-          document.getElementById("alert_placeholder").innerHTML = '';  
-          document.getElementById('alert_placeholder').appendChild(makeUL(bArrayNew));
-          
-          
-        }
+        view.popup.content = zcontent;        
+        view.popup.visible = true;        
       }  
               
       var amenities = document.getElementById("infoAmenities");
@@ -245,23 +201,15 @@ require([
      
       function queryFdo(myval) {
         var query = fdoLayer.createQuery();
-        if(myval == 'Special'){
-          query.where = myval + " <> 'null'"
-          return fdoLayer.queryFeatures(query);
-        }
-        else{
-          query.where = myval + " = 'Yes'"
-          return fdoLayer.queryFeatures(query);
-        } 
+        query.where = myval + " = 'Yes'"
+        return fdoLayer.queryFeatures(query);        
       }
 
       function displayResults(results) {
-        //document.getElementById("alert_placeholder").style.visibility = "visible"; 
-        //document.getElementById("alert_placeholder").innerHTML = ''; 
         view.extent = new Extent({ xmin: xMin, ymin: yMin, xmax: xMax, ymax: yMax, spatialReference: 102100});       
         
         resultsLayer.removeAll();
-        //console.log(results)
+        
         var features = results.features.map(function(graphic) {
           graphic.symbol = new SimpleFillSymbol({
             color: [ 255,0, 0, 0.6],
@@ -274,20 +222,6 @@ require([
           return graphic;
         });
         
-        var bArray = [];
-        for (i = 0; i < results.features.length; i++) { 
-          bArray.push(results.features[i].attributes.Primary_Building_Name) 
-        };
-
-        bArray.forEach(function(part, index) {
-          if(part == 'Recycling Compost Waste Disposal'){bArray[index] = "Recycling, Compost, and Waste Disposal";}
-        });
-
-        //document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + '<b>List of dormitory: </b>' + bArray.sort().toString().replace(/,/g, ', ');                    
-        document.getElementsByClassName('panel-label')[0].innerHTML = "List of dormitories:";
-        document.getElementById("alert_placeholder").innerHTML = bArray.sort().toString().replace(/,/g, ', ');                    
-        //document.getElementById("foo").innerHTML = '<b>List of dormitory: </b>' + bArray.sort().toString().replace(/,/g, ', ');                    
-        //document.getElementById('results').appendChild(makeUL(bArray.sort()));
         resultsLayer.addMany(features);
       }        
       
@@ -295,10 +229,12 @@ require([
       var dorms = document.getElementById("infoDorms");
 
       dorms.addEventListener("change", function() {
-        console.log("Dorm change")        
+        console.log("Dorm change")
+        view.popup.clear();        
         view.extent = new Extent({ xmin: xMin, ymin: yMin, xmax: xMax, ymax: yMax, spatialReference: 102100});
         var selectedDorms = dorms.options[dorms.selectedIndex].value;
         queryFdoDorms(selectedDorms).then(displayResultsDorms);
+        
         var amenities = document.getElementById("infoAmenities");            
         amenities.options[0].selected = true;        
       });
@@ -310,9 +246,6 @@ require([
       }
 
       function displayResultsDorms(results) {   
-        console.log(view.center);
-        
-        //document.getElementById("alert_placeholder").style.visibility = "visible"; 
         resultsLayer.removeAll();
 
         var features = results.features.map(function(graphic) {
@@ -327,94 +260,32 @@ require([
           
           return graphic;
         });
-        
-        var bArray = [];
-        var bArrayNew = [];      
-        
+
+        var list = document.createElement('ul');
         var obj = results.features[0].attributes;
-        console.log(results.features[0].attributes.Dorm_Name)
-        for(var key in obj){
-          // skip loop if the property is from prototype
-          //console.log(key)
-          if(!obj.hasOwnProperty(key)) continue;            
-          if(typeof obj[key] !== 'object'){
-            if((key == 'BottleFiller' || key == 'CommonRoom' || key == 'ComputerRoom' || key == 'Elevator' || key == 'GameTable' || key == 'Kitchen' || key == 'Laundry' || key == 'MusicPracticeRoom' || key == 'Printer' || key == 'Special' || key == 'StudyRoom' || key == 'RecyclingCompostWasteDisposal' || key == 'VendingMachines' || key == 'Notes' || key == 'url') && obj[key] != 'No' && obj[key] != null ){
-            //if((key == 'Laundry' || key == 'Music' || key == 'Kitchen' || key == 'Common' || key == 'Study' || key == 'Computer' ||  key == 'Printer' || key == 'Elevators' || key == 'VendingMachines' || key == 'RecyclingCompost' || key == 'GameTables' || key == 'Special') && obj[key] != 'No' && obj[key] != null ){
-                bArray.push(key.split(/(?=[A-Z])/).join(" ") + ": " + obj[key])
-            }              
+        //console.log(obj)
+        for(var i in obj){
+            
+          if (obj[i] == "Yes"){
+            //delete obj[i]
+            console.log(obj[i],i);
+            var item = document.createElement('li');                
+            item.appendChild(document.createTextNode(i.split(/(?=[A-Z])/).join(" ")));               
+            list.appendChild(item);
           }
-        }
-        for (var a in bArray){
-          bArrayNew.push(bArray[a].replace(": Yes",""))
-        }
-        bArrayNew.forEach(function(part, index) {
-          if(part == 'Recycling Compost Waste Disposal'){bArrayNew[index] = "Recycling, Compost, and Waste Disposal";}
-        });
-                
-        if (bArrayNew.length  == 0) {
-          //document.getElementById("alert_placeholder").innerHTML = '';
-          //document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + 'There are not amenities in this building!';                    
-          //document.getElementsByClassName('panel-label')[0].innerHTML = "List of amenities:"
-          //document.getElementById("alert_placeholder").innerHTML = '';
-          //document.getElementById("alert_placeholder").innerHTML = 'There are not amenities in this building!'; 
-          document.getElementById("alert_placeholder").innerHTML = '';
-          document.getElementById("alert_placeholder").innerHTML = 'There are not amenities in this building!';                   
-        }
-        else{  
-          //document.getElementById("alert_placeholder").innerHTML = '';          
-          //document.getElementById("alert_placeholder").innerHTML = '<span class="close"></span>' + '<b>List of amenities: </b>' + bArrayNew.toString().replace(/,/g, ', ');                    
-          //document.getElementsByClassName('panel-label')[0].innerHTML = "List of amenities:"
-          //document.getElementById("alert_placeholder").innerHTML = '';
-          //document.getElementById("alert_placeholder").innerHTML = bArrayNew.toString().replace(/,/g, ', ');                    
-          document.getElementById("alert_placeholder").innerHTML = '';  
-          document.getElementById('alert_placeholder').appendChild(makeUL(bArrayNew));
         }
         view.popup.location = {latitude: results.features[0].geometry.centroid.latitude, longitude: results.features[0].geometry.centroid.longitude};
         view.popup.title = results.features[0].attributes.Dorm_Name;
-        view.popup.visible = true;           
-        view.popup.content = document.getElementById("alert_placeholder").innerHTML;          
+        var zimg = results.features[0].attributes.url;
+        var znotes = results.features[0].attributes.Notes;
+        
+        var zcontent = "<img width='300px' src='https://map.harvard.edu/images/bldg_photos/" +zimg+ "'</img>" + "<p>" + znotes + "</p>" + list.outerHTML;        
+        
+        view.popup.content = zcontent;
+        
+        view.popup.visible = true;              
           
         resultsLayer.addMany(features);   
-      }
-
-      // create the list to display values
+      }     
       
-      /*function makeUL(array) {
-        var list = "";
-        for (var member in array) {
-          list += array[member] + ", ";
-          } 
-          console.log(list)           
-        return list;
-      } */
-      function makeUL(array) {
-        var list = document.createElement('ul');
-        for(var i = 0; i < array.length; i++) {               
-            //console.log(array[i])
-            if(!array[i].endsWith('png') && !array[i].startsWith('Notes: ')){      
-              
-                var item = document.createElement('li');                
-                item.appendChild(document.createTextNode(array[i]));               
-                list.appendChild(item);              
-                         
-            }
-            else if(array[i].endsWith('png')){
-              var dom_img = document.createElement("img");  
-              dom_img.src = 'https://map.harvard.edu/images/bldg_photos/' +  array[i].split('url: ')[1];
-              list.appendChild(dom_img);
-            }
-            else{
-              var dom_p = document.createElement("p");  
-              dom_p.appendChild(document.createTextNode(array[i]));
-              list.appendChild(dom_p); 
-            }
-        }
-        /*
-        var DOM_img = document.createElement("img");
-          DOM_img.src = "http://map.harvard.edu/images/bldg_photos/04935%20WIDENER%20LIBRARY%20n%20elev%20032307.png";
-
-          document.getElementById('foo').appendChild(DOM_img);
-        */
-        return list;
-      }
     });
