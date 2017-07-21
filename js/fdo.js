@@ -1,4 +1,4 @@
-// code by Giovanni Zambotti - May 2017
+// code by Giovanni Zambotti - 20 July 2017
 require([
       "esri/Map",
       "esri/views/MapView",      
@@ -29,7 +29,7 @@ require([
       SimpleFillSymbol, UniqueValueRenderer, Extent, Popup) { 
 
       //document.getElementById("foo").style.display = "none"; 
-      var myzoom = 17, lon = -71.116076, lat = 42.37375;
+      var myzoom = 17, lon = -71.116076, lat = 42.37305;
 
       var xMax = -7915458.81211143;
       var xMin = -7917751.9229597915;
@@ -115,7 +115,7 @@ require([
         breakpoints: {xsmall: 768, small: 769, medium: 992, large: 1200}        
       });
       
-      fdoLayer.popupTemplate = fdoPopup; 
+      //fdoLayer.popupTemplate = fdoPopup; 
 
       // Disables map rotation
       view.constraints = {rotationEnabled: false};
@@ -130,7 +130,8 @@ require([
 
       // add on mouse click on a map, clear popup and open it     
       view.on("click", function(evt) {
-        view.popup.clear();        
+        evt.stopPropagation()
+               
         document.getElementById("alert_placeholder").style.display = "none";
         
         var amenities = document.getElementById("infoAmenities");            
@@ -139,8 +140,9 @@ require([
         view.hitTest(screenPoint).then(getSingleBuilding);        
       });
       
-                
+      // create the popup and select the building footprint          
       function getSingleBuilding(response) {                
+        //fdoLayer.popupTemplate = fdoPopup; 
         resultsLayer.removeAll();
         var graphic = response.results[0].graphic;
         var attributes = graphic.attributes;        
@@ -169,12 +171,11 @@ require([
 
         var list = document.createElement('ul');
         var obj = attributes;
-        console.log(obj)
+        console.log(pGraphic.geometry.centroid)
         for(var i in obj){
             
-          if (obj[i] == "Yes"){
-            //delete obj[i]
-            console.log(obj[i],i);
+          if (obj[i] == "Yes"){            
+            //console.log(obj[i],i);
             var item = document.createElement('li');                
             item.appendChild(document.createTextNode(i.split(/(?=[A-Z])/).join(" ")));               
             list.appendChild(item);
@@ -184,9 +185,12 @@ require([
         var zimg = attributes.url;
         var znotes = attributes.Notes;
         var zcontent = "<img width='300px' src='https://map.harvard.edu/images/bldg_photos/" +zimg+ "'</img>" + "<p>" + znotes + "</p>" + list.outerHTML;        
-        
+        view.popup.clear(); 
+        view.popup.location = {latitude: pGraphic.geometry.centroid.latitude, longitude: pGraphic.geometry.centroid.longitude};
+        view.popup.title = name;
         view.popup.content = zcontent;        
-        view.popup.visible = true;        
+        view.popup.visible = true; 
+        view.popup.open();       
       }  
               
       var amenities = document.getElementById("infoAmenities");
