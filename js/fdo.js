@@ -182,12 +182,10 @@ require([
           }
         }
 
-        var zimg = attributes.url;
-        var znotes = attributes.Notes;
-        var zcontent = "<img width='300px' src='https://map.harvard.edu/images/bldg_photos/" +zimg+ "'</img>" + "<p>" + znotes + "</p>" + list.outerHTML;        
+        var zcontent = "<img width='300px' src='https://map.harvard.edu/images/bldg_photos/" + attributes.url + "'</img>" + "<p>" + attributes.Notes + "</p>" + list.outerHTML;        
         view.popup.clear(); 
         view.popup.location = {latitude: pGraphic.geometry.centroid.latitude, longitude: pGraphic.geometry.centroid.longitude};
-        view.popup.title = name;
+        view.popup.title = attributes.Dorm_Name;
         view.popup.content = zcontent;        
         view.popup.visible = true; 
         view.popup.open();       
