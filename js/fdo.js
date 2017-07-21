@@ -182,7 +182,7 @@ require([
           }
         }
 
-        var zcontent = "<img width='300px' src='https://map.harvard.edu/images/bldg_photos/" + attributes.url + "'</img>" + "<p>" + attributes.Notes + "</p>" + list.outerHTML;        
+        var zcontent = "<div><img width='300px' src='https://map.harvard.edu/images/bldg_photos/" + attributes.url + "'</img>" + "<p>" + attributes.Notes + "</p><p>" + list.outerHTML + "</p></div>";        
         view.popup.clear(); 
         view.popup.location = {latitude: pGraphic.geometry.centroid.latitude, longitude: pGraphic.geometry.centroid.longitude};
         view.popup.title = attributes.Dorm_Name;
@@ -281,7 +281,7 @@ require([
         var zimg = results.features[0].attributes.url;
         var znotes = results.features[0].attributes.Notes;
         
-        var zcontent = "<img width='300px' src='https://map.harvard.edu/images/bldg_photos/" +zimg+ "'</img>" + "<p>" + znotes + "</p>" + list.outerHTML;        
+        var zcontent = "<div><img width='300px' src='https://map.harvard.edu/images/bldg_photos/" +zimg+ "'</img>" + "<p>" + znotes + "</p><p>" + list.outerHTML + "</p></div>";        
         
         view.popup.content = zcontent;
         

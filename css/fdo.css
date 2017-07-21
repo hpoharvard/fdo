@@ -44,7 +44,6 @@ ul{
     font-weight: 400; 
     overflow: auto;
     overflow-x: hidden;
-    height: 500px;
 }
 
 .esri-popup__content p {
