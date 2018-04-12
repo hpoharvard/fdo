@@ -1,4 +1,5 @@
 // code by Giovanni Zambotti - 20 July 2017
+// update to ESRI JS 4.6 - 12 April 2018
 require([
       "esri/Map",
       "esri/views/MapView",      
@@ -67,7 +68,7 @@ require([
         yMin = 5216121.17579509;
       };
 
-      var fdoUrl = "https://map.harvard.edu/arcgis/rest/services/FDO/fdo/MapServer"
+      var fdoUrl = "https://map.harvard.edu/arcgis/rest/services/fdo/fdo/MapServer"
       var fdoPopup = { // autocasts as new PopupTemplate()
         title: "{Dorm_Name}",
         /*content: "<img src='https://map.harvard.edu/images/bldg_photos/{url}'</img>" + "<p>{Notes}</p>" +
@@ -137,12 +138,16 @@ require([
         var amenities = document.getElementById("infoAmenities");            
         amenities.options[0].selected = true;        
         var screenPoint = evt.screenPoint;
+        // set location for the popup
+        view.popup.location = evt.mapPoint;
         view.hitTest(screenPoint).then(getSingleBuilding);        
+        
       });
       
       // create the popup and select the building footprint          
       function getSingleBuilding(response) {                
         //fdoLayer.popupTemplate = fdoPopup; 
+        
         resultsLayer.removeAll();
         var graphic = response.results[0].graphic;
         var attributes = graphic.attributes;        
@@ -171,9 +176,8 @@ require([
 
         var list = document.createElement('ul');
         var obj = attributes;
-        console.log(pGraphic.geometry.centroid)
-        for(var i in obj){
-            
+                
+        for(var i in obj){            
           if (obj[i] == "Yes"){            
             //console.log(obj[i],i);
             var item = document.createElement('li');                
@@ -181,14 +185,14 @@ require([
             list.appendChild(item);
           }
         }
-
+        // create content for the popup
         var zcontent = "<div><img width='300px' src='https://map.harvard.edu/images/bldg_photos/" + attributes.url + "'</img>" + "<p>" + attributes.Notes + "</p><p>" + list.outerHTML + "</p></div>";        
-        view.popup.clear(); 
-        view.popup.location = {latitude: pGraphic.geometry.centroid.latitude, longitude: pGraphic.geometry.centroid.longitude};
-        view.popup.title = attributes.Dorm_Name;
-        view.popup.content = zcontent;        
-        view.popup.visible = true; 
-        view.popup.open();       
+        
+        view.popup.open({
+          title: attributes.Dorm_Name,
+          content: zcontent
+        });
+        
       }  
               
       var amenities = document.getElementById("infoAmenities");
@@ -284,7 +288,7 @@ require([
         var zcontent = "<div><img width='300px' src='https://map.harvard.edu/images/bldg_photos/" +zimg+ "'</img>" + "<p>" + znotes + "</p><p>" + list.outerHTML + "</p></div>";        
         
         view.popup.content = zcontent;
-        
+        console.log(view.popup.content)
         view.popup.visible = true;              
           
         resultsLayer.addMany(features);   
