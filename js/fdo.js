@@ -70,17 +70,9 @@ require([
 
       var fdoUrl = "https://map.harvard.edu/arcgis/rest/services/fdo/fdo/MapServer"
       var fdoPopup = { // autocasts as new PopupTemplate()
-        title: "{Dorm_Name}",
-        /*content: "<img src='https://map.harvard.edu/images/bldg_photos/{url}'</img>" + "<p>{Notes}</p>" +
-        "<ul><li>Bottle Filler: {BottleFiller}</li><li>Common Room: {CommonRoom}</li><li>Computer Room: {ComputerRoom}</li><li>Elevator: {Elevator}</li><li>Game Table: {GameTable}</li><li>Kitchen: {Kitchen}</li><li>Laundry: {Laundry}</li><li>Music Room: {MusicRoom}</li><li>Printer: {Printer}</li><li>Study Room: {StudyRoom}</li><li>Recycling Compost Stations: {RecyclingCompostStations}</li><li>Vending Machine: {VendingMachine}</li></ul>"      
-        */
+        title: "{Dorm_Name}",       
       };
-      //var layerBuildingTextUrl = "https://map.harvard.edu/arcgis/rest/services/MapText/MapServer";
-      //var layerbaseUrl = "https://map.harvard.edu/arcgis/rest/services/AerialBase/MapServer"
-      //var layerbase = new TileLayer({url: layerbaseUrl});
-      //var renderer;
-      //var layerBuildingText = new MapImageLayer(layerBuildingTextUrl);
-
+      
       var buildingRenderer = new SimpleRenderer({
         symbol: new SimpleFillSymbol({
           color: [0,137, 252, 0.4 ],
@@ -140,8 +132,9 @@ require([
         var screenPoint = evt.screenPoint;
         // set location for the popup
         view.popup.location = evt.mapPoint;
-        view.hitTest(screenPoint).then(getSingleBuilding);        
-        
+        //view.hitTest(screenPoint).then(getSingleBuilding);        
+        view.hitTest(screenPoint).then(getSingleBuilding)
+                
       });
       
       // create the popup and select the building footprint          
@@ -239,8 +232,8 @@ require([
         view.popup.clear();        
         view.extent = new Extent({ xmin: xMin, ymin: yMin, xmax: xMax, ymax: yMax, spatialReference: 102100});
         var selectedDorms = dorms.options[dorms.selectedIndex].value;
-        queryFdoDorms(selectedDorms).then(displayResultsDorms);
         
+        queryFdoDorms(selectedDorms).then(displayResultsDorms)        
         var amenities = document.getElementById("infoAmenities");            
         amenities.options[0].selected = true;        
       });
@@ -248,12 +241,11 @@ require([
       function queryFdoDorms(myval) {
         var query = fdoLayer.createQuery();
         query.where = "Primary_Building_Name = '" + myval + "'"
-        return fdoLayer.queryFeatures(query);         
+        return fdoLayer.queryFeatures(query);        
       }
 
       function displayResultsDorms(results) {   
         resultsLayer.removeAll();
-
         var features = results.features.map(function(graphic) {
           graphic.symbol = new SimpleFillSymbol({
             color: [ 255,0, 0, 0.6],
@@ -263,35 +255,32 @@ require([
               width: 2
             }
           });
-          
           return graphic;
         });
-
+        
         var list = document.createElement('ul');
         var obj = results.features[0].attributes;
         //console.log(obj)
-        for(var i in obj){
-            
-          if (obj[i] == "Yes"){
-            //delete obj[i]
-            console.log(obj[i],i);
+        for(var i in obj){            
+          if (obj[i] == "Yes"){        
+            //console.log(obj[i],i);
             var item = document.createElement('li');                
             item.appendChild(document.createTextNode(i.split(/(?=[A-Z])/).join(" ")));               
             list.appendChild(item);
           }
-        }
-        view.popup.location = {latitude: results.features[0].geometry.centroid.latitude, longitude: results.features[0].geometry.centroid.longitude};
-        view.popup.title = results.features[0].attributes.Dorm_Name;
+        }        
         var zimg = results.features[0].attributes.url;
-        var znotes = results.features[0].attributes.Notes;
-        
+        var znotes = results.features[0].attributes.Notes;        
         var zcontent = "<div><img width='300px' src='https://map.harvard.edu/images/bldg_photos/" +zimg+ "'</img>" + "<p>" + znotes + "</p><p>" + list.outerHTML + "</p></div>";        
         
-        view.popup.content = zcontent;
-        console.log(view.popup.content)
-        view.popup.visible = true;              
-          
-        resultsLayer.addMany(features);   
-      }     
-      
+        view.center = [ results.features[0].geometry.centroid.longitude, results.features[0].geometry.centroid.latitude]
+
+        view.popup.open({
+          title: results.features[0].attributes.Dorm_Name,
+          content: zcontent,
+          updateLocationEnabled: true,
+          location: view.center
+        });        
+        resultsLayer.addMany(features);        
+      }         
     });
