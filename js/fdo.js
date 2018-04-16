@@ -30,7 +30,7 @@ require([
       SimpleFillSymbol, UniqueValueRenderer, Extent, Popup) { 
 
       //document.getElementById("foo").style.display = "none"; 
-      var myzoom = 17, lon = -71.116076, lat = 42.37305;
+      var myzoom = 17, lon = -71.116076, lat = 42.37205;
 
       var xMax = -7915458.81211143;
       var xMin = -7917751.9229597915;
